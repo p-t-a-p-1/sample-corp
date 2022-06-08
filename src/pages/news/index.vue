@@ -6,8 +6,10 @@
 </template>
 
 <script>
+import HeaderMeta from '~/mixins/meta'
 export default {
   name: 'NewsIndexPage',
+  mixins: [HeaderMeta],
   // データをWPから取得し、ページコンポーネントへ直接セットする
   async asyncData (context) {
     // WP REST APIのベースURL
@@ -22,6 +24,15 @@ export default {
     // posts: posts
     return {
       posts
+    }
+  },
+  data () {
+    return {
+      meta: {
+        title: 'お知らせのたいとる',
+        description: 'aaa',
+        ogUrl: ''
+      }
     }
   }
 }

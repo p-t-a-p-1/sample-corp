@@ -17,8 +17,10 @@
 </template>
 
 <script>
+import HeaderMeta from '~/mixins/meta'
 export default {
   name: 'AboutPage',
+  mixins: [HeaderMeta],
   data () {
     return {
       contents: [
@@ -42,7 +44,12 @@ export default {
           name: '代表者名',
           value: '〇〇 〇〇'
         }
-      ]
+      ],
+      meta: {
+        title: '会社情報',
+        description: 'aboutのdescription',
+        ogUrl: 'https://example.com/about/'
+      }
     }
   }
 }

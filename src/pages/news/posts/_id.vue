@@ -2,25 +2,55 @@
   <article class="article">
     <header class="article__head">
       <p class="article__head__date">
-        {{ post.date }}
+        {{ postData.modified | dateFilter }}
       </p>
       <h1 class="article__head__title">
-        {{ post.title }}
+        {{ postData.title.rendered }}
       </h1>
     </header>
     <main class="article__main">
-      <figure class="article__main__thumbnail">
-        <img :src="post.thumbnailImgSrc" :alt="post.title">
+      <figure v-if="postData._embedded['wp:featuredmedia']" class="article__main__thumbnail">
+        <img :src="postData._embedded['wp:featuredmedia'][0].source_url" :alt="postData.title.rendered">
       </figure>
       <!-- eslint-disable-next-line vue/no-v-html -->
-      <div class="article__main__content" v-html="post.content" />
+      <div class="article__main__content" v-html="postData.content.rendered" />
     </main>
   </article>
 </template>
 
 <script>
+import HeaderMeta from '~/mixins/meta'
 export default {
   name: 'NewsDetailPage',
+  mixins: [HeaderMeta],
+  async asyncData ({ params, $config, $axios, error }) {
+    // WP REST APIのベースURL
+    const baseUrl = $config.wpBaseUrl
+    // お知らせの詳細記事を取得するためのエンドポイント作成
+    const postDetailUrl = `${baseUrl}posts/${params.id}?_embed`
+    // axiosを使って記事を取得
+    const postData = await $axios
+      .$get(postDetailUrl)
+      .then((post) => {
+        return post
+      })
+      .catch((e) => {
+        // 取得できない場合はエラーページへ遷移
+        error({
+          statusCode: 404,
+          message: 'not found'
+        })
+      })
+    return {
+      postData,
+      meta: {
+        title: postData.title.rendered,
+        description: postData.content.rendered,
+        ogUrl: `https://example.com/news/posts/${params.id}`,
+        ogImage: postData._embedded['wp:featuredmedia'][0].source_url
+      }
+    }
+  },
   data () {
     return {
       post: {
