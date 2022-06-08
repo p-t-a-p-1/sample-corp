@@ -11,14 +11,14 @@ export default {
   name: 'NewsIndexPage',
   mixins: [HeaderMeta],
   // データをWPから取得し、ページコンポーネントへ直接セットする
-  async asyncData (context) {
+  async asyncData ({ payload, $config, $axios }) {
     // WP REST APIのベースURL
-    const baseUrl = context.$config.wpBaseUrl
+    const baseUrl = $config.wpBaseUrl
     // お知らせの記事を10件取得するためのエンドポイント作成
     const newsUrl = baseUrl + 'posts?_embed&per_page=10&categories=2'
 
     // 記事を取得
-    const posts = await context.$axios.$get(newsUrl)
+    const posts = payload || await $axios.$get(newsUrl)
     // <template></template>で使えるようにする
 
     // posts: posts

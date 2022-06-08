@@ -1,3 +1,4 @@
+import axios from 'axios'
 export default {
 
   srcDir: './src',
@@ -78,6 +79,38 @@ export default {
   generate: {
     exclude: [
       '/contact'
-    ]
+    ],
+    async routes () {
+      return await axios.get(`${process.env.WP_BASE_URL}posts?_embed&categories=2`)
+        .then((response) => {
+          // 全お知らせ記事情報
+          const newsData = response.data
+
+          // お知らせ詳細ごとのルーティング、
+          // そのルーティングに対する記事情報をオブジェクトとしてまとめる
+          const newsRoutes = newsData.map((news) => {
+            return {
+              route: `/news/posts/${news.id}`,
+              payload: news
+            }
+          })
+
+          // トップページは最新3つ
+          const topNewsData = newsData.slice(0, 3)
+
+          // トップ・お知らせ一覧のルーティング、全お知らせ詳細のルーティングを配列化
+          return [
+            {
+              route: '/',
+              payload: topNewsData
+            },
+            {
+              route: '/news',
+              payload: newsData
+            },
+            ...newsRoutes
+          ]
+        })
+    }
   }
 }

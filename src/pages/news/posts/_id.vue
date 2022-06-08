@@ -23,13 +23,13 @@ import HeaderMeta from '~/mixins/meta'
 export default {
   name: 'NewsDetailPage',
   mixins: [HeaderMeta],
-  async asyncData ({ params, $config, $axios, error }) {
+  async asyncData ({ payload, params, $config, $axios, error }) {
     // WP REST APIのベースURL
     const baseUrl = $config.wpBaseUrl
     // お知らせの詳細記事を取得するためのエンドポイント作成
     const postDetailUrl = `${baseUrl}posts/${params.id}?_embed`
     // axiosを使って記事を取得
-    const postData = await $axios
+    const postData = payload || await $axios
       .$get(postDetailUrl)
       .then((post) => {
         return post
